@@ -1,0 +1,34 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+
+  test:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        racket-version: ['7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7', 'current']
+        variant: ['regular', 'CS']
+        exclude:
+        - racket-version: 7.0
+          variant: 'CS'
+        - racket-version: 7.1
+          variant: 'CS'
+        - racket-version: 7.2
+          variant: 'CS'
+        - racket-version: 7.3
+          variant: 'CS'
+    
+    - uses: actions/checkout@v2
+    - uses: Bogdanp/setup-racket@v0.8
+      with:
+          architecture: 'x64'
+          distribution: 'minimal'
+          variant: ${{ matrix.variant }}
+          version: ${{ matrix.version }}
+    - run: raco pkg install --auto --link $PWD
+    - run: raco test -c bv
+
