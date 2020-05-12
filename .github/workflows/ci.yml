@@ -10,16 +10,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        racket-version: ['7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7', 'current']
+        racket-version: ['7.0', '7.1', '7.2', '7.3', '7.6', '7.7', 'current']
         variant: ['regular', 'CS']
         exclude:
-        - racket-version: 7.0
+        - racket-version: '7.0'
           variant: 'CS'
-        - racket-version: 7.1
+        - racket-version: '7.1'
           variant: 'CS'
-        - racket-version: 7.2
+        - racket-version: '7.2'
           variant: 'CS'
-        - racket-version: 7.3
+        - racket-version: '7.3'
           variant: 'CS'
 
     steps:
