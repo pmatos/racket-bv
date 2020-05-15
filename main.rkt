@@ -4,5 +4,6 @@
 (require "private/bv.rkt"
          "private/bv-utils.rkt")
 
-(provide (all-defined-out))
+(provide (all-from-out "private/bv.rkt")
+         (all-from-out "private/bv-utils.rkt"))
 ;; ---------------------------------------------------------------------------------------------------
