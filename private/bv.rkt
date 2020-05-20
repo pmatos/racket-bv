@@ -19,6 +19,8 @@
   [bv? (any/c . -> . boolean?)]
   ;; Zero predicate
   [bvzero? (bv? . -> . boolean?)]
+  ;; Bitvector predicate
+  [bitvector? (any/c . -> . boolean?)]
   ;; Bitvector constructor
   [bv (exact-integer? (or/c exact-positive-integer? bitvector?) . -> . bv?)]
   ;; Bitvector equality
@@ -140,14 +142,13 @@
                                   (lambda (bv2) (equal? (sbv-type bv2) (sbv-type bv1))))])
                [out bv?])]
   ;; Bitvector concatenation
-  [concat (->i ([bv bv?]
-                [bvs (listof bv?)])
+  [concat (->i ([bv bv?]) #:rest (bvs (listof bv?))
                [result (bv bvs)
                        (and/c bv? (lambda (result)
                                     (= (bitvector-size (sbv-type result))
-                                       (for/fold ([s 0])
+                                       (for/fold ([s (bitvector-size (sbv-type bv))])
                                                  ([b (in-list bvs)])
-                                         (bitvector-size (sbv-type b))))))])]
+                                         (+ s (bitvector-size (sbv-type b)))))))])]
   ;; Bitvector extraction
   [extract (->i ([i (bv) (and/c natural-number/c (</c (bitvector-size (sbv-type bv))))]
                  [j (i) (and/c natural-number/c (<=/c i))]
