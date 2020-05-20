@@ -17,6 +17,8 @@
   [rename make-bitvector bitvector (natural-number/c . -> . bitvector?)]
   ;; Alias for bv?
   [bv? (any/c . -> . boolean?)]
+  ;; Zero predicate
+  [bvzero? (bv? . -> . boolean?)]
   ;; Bitvector constructor
   [bv (exact-integer? (or/c exact-positive-integer? bitvector?) . -> . bv?)]
   ;; Bitvector equality
@@ -218,6 +220,9 @@
 
 ;; Predicate rename
 (define bv? sbv?)
+
+(define (bvzero? bv)
+  (= (sbv-val bv) 0))
 
 ;; Returns a predicate that recognizes bitvectors of width n
 (struct bitvector (size)
