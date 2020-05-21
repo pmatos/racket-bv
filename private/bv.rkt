@@ -175,7 +175,11 @@
   ;; Bitvector to natural number conversion
   [bitvector->natural (bv? . -> . natural-number/c)]
   ;; Integer to bitvector
-  [integer->bitvector (integer? bitvector? . -> . bv?)]))
+  [integer->bitvector (integer? bitvector? . -> . bv?)]
+  ;; bit extraction
+  [bit (->i ([i exact-nonnegative-integer?] [bv bv?])
+            [result (and/c bv? (lambda (r) (= 1 (bitvector-size (sbv-type r)))))])]))
+  
 
 ;; ---------------------------------------------------------------------------------------------------
 
@@ -389,6 +393,10 @@
 (define (integer->bitvector i t)
   (make-bv (bitwise-and i (bitmask (bitvector-size t))) t))
 
+(define/match (bit n bvec)
+  [(i (sbv v _))
+   (bv (bitwise-and 1 (arithmetic-shift v (- i))) 1)])
+
 ;; ---------------------------------------------------------------------------------------------------
 
 ;; Helper functions for the interface
@@ -462,6 +470,10 @@
     (test-case "bitvectors can be used as predicates 2"
       (check-false ((make-bitvector 4) (bv 0 32))))
 
+    (test-case "bit extraction"
+      (check eq? (bit 1 (bv 3 4)) (bv 1 1))
+      (check eq? (bit 2 (bv 1 4)) (bv 0 1)))
+    
     ;; Issue 42 test
     (test-case "srem needs to return positive values"
       (check = (bitvector->natural (bvsrem (bv #xb4abd572 32) (bv #xc3625a93 32))) #xf1497adf))
