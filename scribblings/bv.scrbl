@@ -271,3 +271,13 @@ Returns @racket[(bveq x (bv 0 n))].
 @section{Extensions}
 
 The following operators are an extension to what Rosette provides.
+
+@defproc[(random-bv [n exact-positive-integer?]) bv?]{
+Returns a random bitvector, of type @racket[(bitvector (* 8 n))], between @racket[0] and @racket[(- (expt 2 (* 8 n)) 1)] (inclusive).
+}
+
+@defproc[(random-bv/limits [n exact-positive-integer?]
+                           [min exact-nonnegative-integer?]
+                           [max exact-nonnegative-integer?]) bv?]{
+Returns random bitvector, of type @racket[(bitvector (* 8 n))], between @var[min] and @var[max] (inclusive).
+}
