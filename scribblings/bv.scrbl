@@ -8,7 +8,8 @@
 @author[(author+email "Paulo Matos" "pmatos@linki.tools")]
 
 @(define bveval
-   (parameterize ([sandbox-output 'string]
+   (parameterize ([print-as-expression #f]
+                  [sandbox-output 'string]
                   [sandbox-error-output 'string]
                   [sandbox-memory-limit 50])
      (make-evaluator 'racket/base #:requires (list 'bv))))
