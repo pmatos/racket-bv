@@ -186,9 +186,10 @@
                         [result (t)
                                 (and/c bv?
                                        (lambda (r)
-                                         (if (bitvector? t)
-                                             (equal? t (sbv-type r))
-                                             (= t (bitvector-size (sbv-type r))))))])]))
+                                         (cond [(bitvector? t) (equal? t (sbv-type r))]
+                                               [(positive-integer? t) (= t (bitvector-size (sbv-type r)))]
+                                               [(unsupplied-arg? t) (= 1 (bitvector-size (sbv-type r)))]
+                                               [else #false])))])]))
   
 
 ;; ---------------------------------------------------------------------------------------------------
