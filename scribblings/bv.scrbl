@@ -11,7 +11,7 @@
    (parameterize ([print-as-expression #f]
                   [sandbox-output 'string]
                   [sandbox-error-output 'string]
-                  [sandbox-memory-limit 50])
+                  [sandbox-memory-limit 100])
      (make-evaluator 'racket/base #:requires (list 'bv))))
 
 @defmodule[bv]
