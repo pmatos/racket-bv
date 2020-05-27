@@ -11,7 +11,7 @@
    (parameterize ([print-as-expression #f]
                   [sandbox-output 'string]
                   [sandbox-error-output 'string]
-                  [sandbox-memory-limit 50])
+                  [sandbox-memory-limit 100])
      (make-evaluator 'racket/base #:requires (list 'bv))))
 
 @defmodule[bv]
@@ -257,17 +257,14 @@ Returns @racket[(bveq x (bv 0 n))].
 @; Returns @racket[(not (bvzero? x))].
 @; }
 
-@; @defproc[(bool->bitvector [b any/c] [t (or/c positive-integer? (bitvector n)) (bitvector 1)]) bv?]{
-@; Returns @racket[(bv 0 t)] if @racket[(false? b)] and otherwise returns @racket[(bv 1 t)], where
-@; @racket[t] is @racket[(bitvector 1)] by default. If provided, @racket[t] must be a concrete positive
-@; integer or a concrete bitvector type value.
-@;  @examples[#:eval bveval
-@;   (bool->bitvector #f 3)
-@;   (bool->bitvector "non-false-value")
-@;   (define-symbolic b boolean?)
-@;   (bool->bitvector b)
-@;  ]
-@; }
+@defproc[(bool->bitvector [b any/c] [t (or/c positive-integer? (bitvector n)) (bitvector 1)]) bv?]{
+Returns @racket[(bv 0 t)] if @racket[(false? b)] and otherwise returns @racket[(bv 1 t)], where
+@racket[t] is @racket[(bitvector 1)] by default. If provided, @racket[t] must be a positive integer or a bitvector type value.
+ @examples[#:eval bveval
+  (bool->bitvector #f 3)
+  (bool->bitvector "non-false-value")
+ ]
+}
 
 @section{Extensions}
 
