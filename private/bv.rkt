@@ -179,7 +179,16 @@
   [integer->bitvector (integer? bitvector? . -> . bv?)]
   ;; bit extraction
   [bit (->i ([i exact-nonnegative-integer?] [bv bv?])
-            [result (and/c bv? (lambda (r) (= 1 (bitvector-size (sbv-type r)))))])]))
+            [result (and/c bv? (lambda (r) (= 1 (bitvector-size (sbv-type r)))))])]
+  ;; Bool to bitvector conversion
+  [bool->bitvector (->i ([b any/c])
+                        ([t (or/c positive-integer? bitvector?)])
+                        [result (t)
+                                (and/c bv?
+                                       (lambda (r)
+                                         (if (bitvector? t)
+                                             (equal? t (sbv-type r))
+                                             (= t (bitvector-size (sbv-type r))))))])]))
   
 
 ;; ---------------------------------------------------------------------------------------------------
@@ -398,6 +407,11 @@
   [(i (sbv v _))
    (bv (bitwise-and 1 (arithmetic-shift v (- i))) 1)])
 
+(define (bool->bitvector x [t (bitvector 1)])
+  (if x
+      (bv 1 t)
+      (bv 0 t)))
+
 ;; ---------------------------------------------------------------------------------------------------
 
 ;; Helper functions for the interface
@@ -474,6 +488,12 @@
     (test-case "bit extraction"
       (check eq? (bit 1 (bv 3 4)) (bv 1 1))
       (check eq? (bit 2 (bv 1 4)) (bv 0 1)))
+
+    (test-case "boolean to bitvector conversion"
+      (check eq? (bool->bitvector #f 3) (bv 0 3))
+      (check eq? (bool->bitvector #f) (bv 0 1))
+      (check eq? (bool->bitvector "not false") (bv 1 1))
+      (check eq? (bool->bitvector 42 10) (bv 1 10)))
     
     ;; Issue 42 test
     (test-case "srem needs to return positive values"
