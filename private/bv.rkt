@@ -407,7 +407,7 @@
   [(i (sbv v _))
    (bv (bitwise-and 1 (arithmetic-shift v (- i))) 1)])
 
-(define (bool->bitvector x [t (bitvector 1)])
+(define (bool->bitvector x [t (-bitvector 1)])
   (if x
       (bv 1 t)
       (bv 0 t)))
