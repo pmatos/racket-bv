@@ -11,7 +11,7 @@
     "racket-doc"
     "rackunit-lib"
     "quickcheck"
-    ("rosette" #:version "3.2")))
+    "rosette"))
 
 (define scribblings '(("scribblings/bv.scrbl" ())))
 (define pkg-desc "Bitvector library following a Rosette-like API")

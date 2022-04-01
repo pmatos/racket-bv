@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        racket-version: ['7.9', '8.4', 'current']
+        racket-version: ['8.1', '8.4', 'current']
 
     steps:
     - uses: actions/checkout@v2
