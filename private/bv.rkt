@@ -225,13 +225,17 @@
 ;; Example:
 ;; (bitmask 5) => 0x1f
 ;; (bitmask 32) => 0xffffffff
-(define/memoize (bitmask n)
+(define (bitmask n)
   (sub1 (arithmetic-shift 1 n)))
 
 (struct sbv
   (val    ; natural, value of bitvector as a natural number
    type)  ; bitvector, which contains size of bitvector in bits
   #:constructor-name -sbv
+  #:methods gen:equal+hash
+  [(define equal-proc bv=?)
+   (define hash-proc bv-hash-1)
+   (define hash2-proc bv-hash-2)]
   #:methods gen:custom-write
   [(define (write-proc self port mode)
      (match self
@@ -245,7 +249,7 @@
        [_ (error "unknown sbv format")]))])
 
 ;; Memoized constructor
-(define/memoize (make-bv val type)
+(define (make-bv val type)
   (-sbv val type))
 
 ;; Predicate rename
@@ -278,7 +282,9 @@
     [(val s)
      (make-bv (bitwise-and val (bitmask s)) (make-bitvector s))]))
 
-(define bveq eq?)
+(define/match (bveq bv1 bv2)
+  [((sbv v1 (bitvector s1)) (sbv v2 (bitvector s2)))
+   (and (= v1 v2) (= s1 s2))])
 
 (define/match (bvscmp bv1 bv2 op)
   [((sbv v1 (bitvector s)) (sbv v2 _) op)
@@ -480,20 +486,17 @@
     (test-case "two equal bvs are equal?"
       (check equal? (bv 2 32) (bv 2 32)))
 
-    (test-case "two equal bvs are eq? (with memoization)"
-      (check eq? (bv 2 32) (bv 2 32)))
-
     (test-case "zeros are equal?"
       (check equal? (bv 0 32) (bv 0 32)))
 
     (test-case "operation result returns equal to zero?"
-      (check eq? (bvsub (bv 2 32) (bv 2 32)) (bvsub (bv 1 32) (bv 1 32))))
+      (check equal? (bvsub (bv 2 32) (bv 2 32)) (bvsub (bv 1 32) (bv 1 32))))
 
     (test-case "omit bitvector call should have no impact in eq?"
-      (check eq? (bv 0 32) (bv 0 (make-bitvector 32))))
+      (check equal? (bv 0 32) (bv 0 (make-bitvector 32))))
 
     (test-case "bitvectors are also equal"
-      (check eq? (make-bitvector 32) (make-bitvector 32)))
+      (check equal? (make-bitvector 32) (make-bitvector 32)))
 
     (test-case "bitvectors can be used as predicates"
       (check-true ((make-bitvector 32) (bv 2 32))))
@@ -502,19 +505,25 @@
       (check-false ((make-bitvector 4) (bv 0 32))))
 
     (test-case "bit extraction"
-      (check eq? (bit 1 (bv 3 4)) (bv 1 1))
-      (check eq? (bit 2 (bv 1 4)) (bv 0 1)))
+      (check equal? (bit 1 (bv 3 4)) (bv 1 1))
+      (check equal? (bit 2 (bv 1 4)) (bv 0 1)))
 
     (test-case "boolean to bitvector conversion"
-      (check eq? (bool->bitvector #f 3) (bv 0 3))
-      (check eq? (bool->bitvector #f) (bv 0 1))
-      (check eq? (bool->bitvector "not false") (bv 1 1))
-      (check eq? (bool->bitvector 42 10) (bv 1 10)))
+      (check equal? (bool->bitvector #f 3) (bv 0 3))
+      (check equal? (bool->bitvector #f) (bv 0 1))
+      (check equal? (bool->bitvector "not false") (bv 1 1))
+      (check equal? (bool->bitvector 42 10) (bv 1 10)))
     
     ;; Issue 42 test
     (test-case "srem needs to return positive values"
       (check = (bitvector->natural (bvsrem (bv #xb4abd572 32) (bv #xc3625a93 32))) #xf1497adf))
 
+    ;; Issue 2 test
+    ;; https://github.com/pmatos/racket-bv/issues/2
+    (test-case "memoizing 64bits is problematic"
+      (check-true (bveq (bv #x3f0c34bf93adf121 64)
+                        (bv #x3f0c34bf93adf121 64))))
+    
     ;; These are thorough tests to ensure rosette and this library behave the same
     (with-large-test-count
 
